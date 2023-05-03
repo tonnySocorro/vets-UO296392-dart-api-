@@ -4,11 +4,13 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'dart:convert';
+import 'package:vets_uo296392_dart_api/db_manager.dart';
+
 // Configure routes.
 final _router = Router()
   ..get('/', _rootHandler)
   ..get('/echo/<message>', _echoHandler)
-    ..get('/users', _usersHandler);
+  ..get('/users', _usersHandler);
 
 Response _rootHandler(Request req) {
   return Response.ok('Hello, World!\n');
@@ -18,16 +20,12 @@ Response _echoHandler(Request request) {
   final message = request.params['message'];
   return Response.ok('$message\n');
 }
-Response _usersHandler(Request request) {
-  List<Map<String, dynamic>> users  = [
-    {'name': 'Juan', 'email': 'juan@example.com'},
-    {'name': 'Maria', 'email': 'maria@example.com'},
-    {'name': 'Alex', 'email': 'alez@example.com'}
-  ];
 
-  return Response.ok( json.encode(users));
+Future<Response> _usersHandler(Request request) async {
+  DbManager dbManager = DbManager.collection("users");
+  final users = await dbManager.findAll();
+  return Response.ok(json.encode(users));
 }
-
 
 void main(List<String> args) async {
   // Use any available host or container IP (usually `0.0.0.0`).
