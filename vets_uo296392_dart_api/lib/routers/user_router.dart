@@ -10,6 +10,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 final userRouter = Router()
   ..get('/users', _usersHandler)
   ..post('/users/signUp', _signUpHanler)
+  ..delete('/users/<id>', _deleteUserHandler)
   ..post('/users/login', _loginHanler)
   ..get('/users/<id>', _getUserHanler);
 
@@ -120,4 +121,16 @@ validateUser(User user) async {
     errors.add({"surname": "Password should have at least 6 characters"});
   }
   return errors;
+}
+
+Future<Response> _deleteUserHandler(Request request) async {
+  final dynamic token =
+      request.headers.containsKey("token") ? request.headers["token"] : null;
+  final Map<String, dynamic> verifiedToken =
+      jwt_service.UserTokenService.verifyJwt(token);
+  if (verifiedToken['authorized'] == false) {
+    return Response.unauthorized(json.encode(verifiedToken));
+  } else {
+    return Response.ok('Usuario eliminando correctamente');
+  }
 }

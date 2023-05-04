@@ -68,4 +68,20 @@ class DbManager {
     final result = await _collection.findOne(filter);
     return result;
   }
+
+  Future<dynamic> deleteOne(filter) async {
+    try {
+      await connect();
+      final result = await _collection.deleteOne(filter);
+      if (result.isSuccess) {
+        return {"deletedCount": result.deletedCount};
+      } else {
+        return {"error": result.writeError.errmsg};
+      }
+    } catch (error) {
+      return {"error": "Se ha producido un error inesperado"};
+    } finally {
+      await close();
+    }
+  }
 }
